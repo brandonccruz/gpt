@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT on Wix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #chatbox {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #messages {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user {
+            color: blue;
+        }
+        .bot {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatbox">
+        <div id="messages"></div>
+        <input type="text" id="userInput" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput').value;
+            if (!userInput) return;
+
+            document.getElementById('messages').innerHTML += `<div class="message user"><strong>User:</strong> ${userInput}</div>`;
+            document.getElementById('userInput').value = '';
+
+            const response = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer YOUR_OPENAI_API_KEY'
+                },
+                body: JSON.stringify({
+                    prompt: userInput,
+                    max_tokens: 150,
+                    n: 1,
+                    stop: null,
+                    temperature: 0.9,
+                })
+            });
+
+            const data = await response.json();
+            const botReply = data.choices[0].text.trim();
+
+            document.getElementById('messages').innerHTML += `<div class="message bot"><strong>Bot:</strong> ${botReply}</div>`;
+        }
+    </script>
+</body>
+</html>
